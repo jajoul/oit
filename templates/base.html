@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}The Global Information Superhighway - Tweets!{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'term/images/favicon.ico' %}" type="image/x-icon">
+    
+    <!-- Meta Tags -->
+    <meta name="description" content="A blast from the past - 90s style tweets and messages">
+    <meta name="keywords" content="90s, retro, web, tweets, nostalgia">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'term/css/retro.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome (for icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        /* 90s-style animated background */
+        @keyframes bg-scrolling {
+            0% { background-position: 0 0; }
+            100% { background-position: 100% 100%; }
+        }
+        
+        /* 90s-style animated text */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .blink {
+            animation: blink 1s step-end infinite;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green);
+        }
+        
+        /* 90s-style text effects */
+        .text-outline {
+            text-shadow: var(--text-outline);
+        }
+        
+        .text-glow {
+            text-shadow: 0 0 5px currentColor;
+        }
+        
+        /* 90s-style buttons */
+        .retro-button {
+            background: var(--button-bg);
+            color: var(--button-text);
+            border: var(--button-border);
+            padding: 8px 16px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 3px 3px 0 0 #000;
+        }
+        
+        .retro-button:hover {
+            background: var(--button-hover-bg);
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 0 #000;
+        }
+        
+        .retro-button:active {
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0 0 #000;
+        }
+        
+        /* 90s-style inputs */
+        .retro-input {
+            background: var(--input-bg);
+            border: var(--input-border);
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .retro-input:focus {
+            outline: none;
+            box-shadow: var(--input-focus);
+        }
+        
+        /* 90s-style alerts */
+        .alert {
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #000;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        
+        .alert-success { background: var(--success); color: #fff; }
+        .alert-warning { background: var(--warning); color: #000; }
+        .alert-error { background: var(--error); color: #fff; }
+        .alert-info { background: var(--info); color: #fff; }
+        
+        /* 90s-style hr */
+        .retro-hr {
+            height: 20px;
+            border: 0;
+            background: url('data:image/svg+xml;utf8,<svg height="20" width="100%" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="10" fill="%23000000"/><rect y="10" width="100%" height="10" fill="%23ff0000"/></svg>') repeat-x;
+            margin: 20px 0;
+        }
+        
+        /* Page loader styles */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--loader-bg, #000080);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        
+        .loader-text {
+            color: var(--loader-text, #00ff00);
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            border: var(--loader-border, 4px solid #00ff00);
+            padding: 1rem 2rem;
+            text-align: center;
+        }
+        
+        /* Skip link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #000080;
+            color: white;
+            padding: 8px;
+            z-index: 100;
+            transition: top 0.3s;
+        }
+        
+        .skip-link:focus {
+            top: 0;
+        }
+        
+        /* Sound toggle button */
+        .sound-toggle {
+            background: var(--sound-toggle-bg, #000080);
+            color: var(--sound-toggle-color, #00ff00);
+            border: 2px solid #0000ff;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+        }
+        
+        .sound-toggle:hover {
+            background: var(--sound-toggle-hover-bg, #0000ff);
+        }
+        
+        /* Tooltip styles */
+        [data-tooltip] {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip {
+            visibility: hidden;
+            width: 120px;
+            background-color: var(--tooltip-bg, #000080);
+            color: var(--tooltip-text, #fff);
+            text-align: center;
+            border-radius: 4px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: var(--tooltip-shadow, 0 0 10px rgba(0, 0, 0, 0.5));
+            font-size: 0.8rem;
+        }
+        
+        /* Back to top button */
+        #back-to-top {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: var(--back-to-top-size, 40px);
+            height: var(--back-to-top-size, 40px);
+            background: var(--back-to-top-bg, #000080);
+            color: var(--back-to-top-color, #fff);
+            border: none;
+            border-radius: var(--back-to-top-border-radius, 50%);
+            cursor: pointer;
+            font-size: 1.5rem;
+            text-align: center;
+            line-height: var(--back-to-top-size, 40px);
+            box-shadow: var(--back-to-top-box-shadow, 0 0 10px rgba(0, 0, 0, 0.5));
+            transition: var(--back-to-top-transition, all 0.3s ease);
+            z-index: 99;
+        }
+        
+        #back-to-top.visible {
+            display: block;
+        }
+        
+        #back-to-top:hover {
+            background: var(--back-to-top-hover-bg, #0000ff);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+    <style>
+        /* Custom styles for our term app */
+        .no-terms {
+            text-align: center;
+            padding: 2rem;
+            background: #fff;
+            border: 2px dashed #000;
+            margin: 2rem 0;
+        }
+        
+        .post-term-btn {
+            display: inline-block;
+            background: #0000ff;
+            color: #fff !important;
+            padding: 10px 20px;
+            margin: 10px 0;
+            text-decoration: none;
+            font-weight: bold;
+            border: 2px solid #000;
+            box-shadow: 3px 3px 0 #000;
+            transition: all 0.2s;
+        }
+        
+        .post-term-btn:hover {
+            background: #0000cc;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #000;
+            color: #fff;
+            text-decoration: none;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+            gap: 5px;
+        }
+        
+        .pagination a, .pagination .current {
+            padding: 5px 10px;
+            border: 2px solid #000;
+            text-decoration: none;
+            color: #000;
+            background: #fff;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .pagination a:hover {
+            background: #0000ff;
+            color: #fff;
+            border-color: #0000ff;
+        }
+        
+        .pagination .current {
+            background: #0000ff;
+            color: #fff;
+            border-color: #0000ff;
+        }
+    </style>
+</head>
+<body class="retro-body">
+    <!-- Page Loader (optional) -->
+    <div id="page-loader" class="page-loader">
+        <div class="loader-text">Loading...</div>
+    </div>
+
+    <!-- Skip to main content (accessibility) -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header -->
+    <header class="retro-header">
+        <div class="header-top">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <a href="/" class="logo-link">
+                            <img src="{% static 'term/images/logo.png' %}" alt="90s Web Terminal" class="logo-img">
+                            <span class="logo-text">90s Web Terminal</span>
+                        </a>
+                    </div>
+                    
+                    <div class="header-controls">
+                        <div class="visitor-counter">
+                            <span class="counter-icon">👤</span>
+                            <span class="counter-number">00001</span> visitors
+                        </div>
+                        <div class="last-updated">
+                            Last updated: <span id="last-updated">{% now "F j, Y H:i" %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="main-nav">
+            <div class="container">
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="/" class="nav-link active">🏠 Home</a></li>
+                    <li class="nav-item"><a href="{% url 'post_term' %}" class="nav-link">📝 New Post</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">📋 Archive</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">📚 Categories</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">📞 Contact</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">❓ About</a></li>
+                </ul>
+            </div>
+        </nav>
+        
+        <div class="header-banner">
+            <marquee behavior="scroll" direction="left" class="banner-marquee">
+                🚀 Welcome to the 90s Web Terminal! • Under Construction • Best viewed with Netscape Navigator • 🚀
+            </marquee>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content">
+        {% block before_content %}{% endblock %}
+        
+        <div class="container">
+            <div class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+        
+        {% block after_content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="retro-footer">
+        <div class="footer-top">
+            <div class="container">
+                <div class="footer-widgets">
+                    <div class="footer-widget">
+                        <h3 class="widget-title">Quick Links</h3>
+                        <ul class="footer-menu">
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Contact</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="widget-title">Connect</h3>
+                        <div class="social-links">
+                            <a href="#" class="social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-link" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                            <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-link" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-widget">
+                        <h3 class="widget-title">Site Info</h3>
+                        <p>© {% now "Y" %} 90s Web Terminal</p>
+                        <p>All Rights Reserved</p>
+                        <p>Best viewed at 800x600 resolution</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-bottom-content">
+                    <div class="browser-notice">
+                        <p>This site looks best in <a href="#">Netscape Navigator</a> or <a href="#">Internet Explorer</a> 5.0+</p>
+                    </div>
+                    
+                    <div class="footer-buttons">
+                        <a href="#" class="footer-button"><img src="{% static 'term/images/netscape-now.gif' %}" alt="Netscape Now!" class="footer-button-img"></a>
+                        <a href="#" class="footer-button"><img src="{% static 'term/images/ie_logo.gif' %}" alt="Best with IE" class="footer-button-img"></a>
+                        <a href="#" class="footer-button"><img src="{% static 'term/images/valid-html401.png' %}" alt="Valid HTML 4.01" class="footer-button-img"></a>
+                        <a href="#" class="footer-button"><img src="{% static 'term/images/css-validator.png' %}" alt="Valid CSS" class="footer-button-img"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to top button -->
+    <button id="back-to-top" class="retro-button" title="Go to top" aria-label="Back to top">
+        <span class="text-glow">↑</span>
+    </button>
+    
+    <!-- Sound toggle button -->
+    <button class="sound-toggle retro-button" onclick="window.RetroTheme.toggleSound()" aria-label="Toggle sound">
+        <span class="text-glow">🔊 Sound On</span>
+    </button>
+    
+    <!-- Animated background elements -->
+    <div class="retro-bg">
+        <div class="pixel pixel-1"></div>
+        <div class="pixel pixel-2"></div>
+        <div class="pixel pixel-3"></div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script src="{% static 'term/js/vendor/modernizr-3.11.2.min.js' %}"></script>
+    <script src="{% static 'term/js/main.js' %}"></script>
+    
+    <script>
+        // Initialize sound preference
+        document.addEventListener('DOMContentLoaded', function() {
+            const isSoundDisabled = localStorage.getItem('soundDisabled') === 'true';
+            const soundButtons = document.querySelectorAll('.sound-toggle');
+            soundButtons.forEach(btn => {
+                btn.innerHTML = isSoundDisabled ? '🔇 Sound Off' : '🔊 Sound On';
+            });
+        });
+    </script>
+    
+    <!-- Google Analytics (example) -->
+    <script>
+        // Replace with your actual GA tracking code
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+        
+        ga('create', 'UA-XXXXX-Y', 'auto');
+        ga('send', 'pageview');
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,51 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.sqlite3
+
+# Django
+*.log
+db.sqlite3
+media/
+staticfiles/
+local_settings.py
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+.Python
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test & coverage
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+
+# Migrations (optional, if you want to ignore generated migrations)
+# **/migrations/*.py
+# **/migrations/*.pyc
+
+# Node (if you use npm/yarn for frontend)
+node_modules/
+
+# dotenv
+.env
+.env.*
+
+# Misc
+*.bak
+*.swp

@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}Open In Terminal{% endblock %}
+
+{% block extra_css %}
+    <style>
+        /* Custom styles to enhance the 90s feel */
+        .retro-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f0f0f0;
+            border: 2px solid #000;
+            box-shadow: 5px 5px 0 #000;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #c0c0c0;
+            padding: 5px 10px;
+            margin-bottom: 20px;
+            border: 2px solid #000;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .refresh-btn {
+            background: #c0c0c0;
+            border: 2px solid #000;
+            padding: 2px 10px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+        }
+        
+        .refresh-btn:active {
+            border-style: inset;
+            padding: 3px 9px 1px 11px;
+        }
+        
+        .tweet {
+            background: #fff;
+            border: 2px solid #000;
+            margin-bottom: 20px;
+            padding: 15px;
+            position: relative;
+        }
+        
+        .tweet-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #000;
+            padding-bottom: 5px;
+        }
+        
+        .tweet-username {
+            font-weight: bold;
+            color: #0000ff;
+        }
+        
+        .tweet-time {
+            color: #666;
+            font-size: 0.8rem;
+        }
+        
+        .tweet-actions {
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        .tweet-actions a {
+            color: #0000ff;
+            text-decoration: underline;
+            margin-left: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .tweet-actions a:hover {
+            color: #ff0000;
+        }
+        
+        .marquee-banner {
+            background: #ffff00;
+            color: #000;
+            padding: 5px 0;
+            margin: 15px 0;
+            border: 1px dashed #000;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="retro-content">
+    <header class="text-center mb-8">
+        <h1 class="text-4xl font-bold mb-2 text-shadow-blue">Welcome to Open In Terminal!</h1>
+        <p class="text-xl">Post term as anonymous!</p>
+        <div class="marquee-banner">
+            <marquee behavior="scroll" direction="left" scrollamount="5">
+                <span class="blink">!! NEW CONTENT ADDED DAILY !!</span> • Click Refresh for Updates! • Under Construction • Best viewed with Netscape Navigator •
+            </marquee>
+        </div>
+    </header>
+
+    <div class="status-bar">
+        <span>STATUS: <span class="online">ONLINE</span></span>
+        <span>LAST UPDATE: <span id="current-time">{% now "m/d/Y h:i A" %}</span></span>
+        <button class="refresh-btn" onclick="window.location.reload()" data-tooltip="Click to refresh the page">
+            [ Refresh Page ]
+        </button>
+    </div>
+
+    <main>
+        {% if not terms %}
+            <div class="no-terms">
+                <p>No terms have been posted yet. Be the first to post one!</p>
+                <a href="{% url 'post_term' %}" class="post-term-btn">[ POST A NEW TERM ]</a>
+            </div>
+        {% else %}
+            {% for term in terms %}
+                <article class="tweet">
+                    <div class="tweet-header">
+                        <span class="tweet-username">@{{ term.author.name|slice:":15" }}{% if term.author.name|length > 15 %}...{% endif %}</span>
+                        <span class="tweet-time">Posted: {{ term.created_at|date:"m/d/Y h:i A" }}</span>
+                    </div>
+                    <div class="tweet-content">
+                        <p>{{ term.term|linebreaksbr }}</p>
+                    </div>
+                    <div class="tweet-actions">
+                        <a href="#" class="reply-btn" data-term-id="{{ term.id }}">[ REPLY ]</a>
+                        <span class="tweet-id">#{{ term.id }}</span>
+                    </div>
+                </article>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" class="pagination-link">« First</a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">‹ Prev</a>
+                    {% endif %}
+                    
+                    <span class="current-page">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">Next ›</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">Last »</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <footer class="text-center mt-12 mb-8 text-sm">
+            <p>© {% now "Y" %} Open In Terminal. All rights reserved.</p>
+            <p class="mt-2">
+                <a href="{% url 'post_term' %}" class="post-term-btn">[ POST A NEW TERM ]</a>
+            </p>
+            <p class="mt-2">
+                <a href="#" class="mr-4" title="Terms of Service">Terms of Service</a> | 
+                <a href="#" class="mx-4" title="Privacy Policy">Privacy Policy</a> | 
+                <a href="#" class="ml-4" title="Contact Us">Contact Us</a>
+            </p>
+            <p class="mt-2 text-xs">
+                Best viewed with any modern browser. No Flash required.
+            </p>
+        </footer>
+    </main>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+    // Update the current time
+    function updateTime() {
+        const now = new Date();
+        const options = { 
+            month: '2-digit', 
+            day: '2-digit', 
+            year: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: true
+        };
+        document.getElementById('current-time').textContent = now.toLocaleString('en-US', options);
+    }
+    
+    // Update time immediately and then every minute
+    updateTime();
+    setInterval(updateTime, 60000);
+    
+    // Add click sound to all links and buttons
+    document.querySelectorAll('a, button').forEach(element => {
+        element.addEventListener('click', function() {
+            window.RetroTheme.playSound('click');
+        });
+    });
+</script>
+{% endblock %}
