@@ -26,7 +26,7 @@ A retro-inspired, community-driven web app for sharing and discovering anonymous
 
 1. **Clone the repository:**
     ```bash
-    git clone https://github.com/yourusername/openinterminal.git
+    git clone https://github.com/jajoul/openinterminal.git
     cd openinterminal
     ```
 
