@@ -2,7 +2,7 @@
 
 A retro-inspired, community-driven web app for sharing and discovering anonymous tech terms, tips, and discussions — all in a nostalgic 90s web terminal style.
 
-![screenshot](docs/screenshot.png)
+![screenshot](oit.png)
 
 ## Features
 
